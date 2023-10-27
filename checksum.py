@@ -5,24 +5,20 @@ def checksum(address, data):
     # split address into two
     source_ip_addr, dest_ip_addr = _addr_split(address)
 
-    # convert addresses to byte strings
-    source_ip_addr = source_ip_addr.encode()
-    dest_ip_addr = dest_ip_addr.encode()
-
     # load in content from the data file
     data = data.read()
 
-    # Build IP psuedo header
-    ip_psuedo_header = {
-        'source_addr': source_ip_addr,
-        'dest_addr': dest_ip_addr
-    }
+    # Build IP pseudo header
+    ip_pseudo_header = _build_ip_pseudo_header(
+        source_ip_address=source_ip_addr,
+        dest_ip_address=dest_ip_addr
+    )
 
     return False
 
 
 def _addr_split(address_pair: str):
-    return address_pair.split(sep=' ', maxsplit=1)
+    return address_pair.strip().split(sep=' ', maxsplit=1)
 
 
 def _addr_to_bytestring(address: str) -> bytes:
@@ -44,4 +40,17 @@ def _ip_split(ip_address: str) -> [int]:
     return [int(part) for part in ip_address.split('.')]
 
 
-checksum(open('tcp_data/tcp_addrs_0.txt', 'r'), open('tcp_data/tcp_data_0.dat', 'rb'))
+def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str) -> bytes:
+
+    ip_pseudo_header = _addr_to_bytestring(source_ip_address)
+    ip_pseudo_header += _addr_to_bytestring(dest_ip_address)
+
+    return ip_pseudo_header
+
+
+def _get_tcp_data_length(content: bytes):
+    return len(content)
+
+
+def _extract_checksum(tcp_header: bytes) -> int:
+    return int.from_bytes(tcp_header[16:18], byteorder='big')
