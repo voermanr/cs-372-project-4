@@ -100,7 +100,7 @@ class TestAddrByteConversion(unittest.TestCase):
         self.assertEqual(
             checksum._addr_to_bytestring(address=address),
             b'\x01\x02\x03\x04',
-            msg='Expected this to work')
+        )
 
     def test_ip_addr_split(self):
         address = '1.2.3.4'
