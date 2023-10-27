@@ -31,6 +31,12 @@ def _addr_to_bytestring(address: str) -> bytes:
     # split address into array
     arr = _ip_split(address)
 
+    for i in range(len(arr)):
+        bytestring += int.to_bytes(arr[i],1, 'big')
+
+    # This should always hold true based on how ip addresses are constructed
+    assert len(bytestring) == 4
+
     return bytestring
 
 
