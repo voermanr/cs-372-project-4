@@ -1,11 +1,9 @@
-import os
 import unittest
 
 import checksum
 
 
 class TestChecksum(unittest.TestCase):
-
     # All this to avoid a magic number.
     EXPECTED_OUTCOMES = {
         0: True,
@@ -27,7 +25,6 @@ class TestChecksum(unittest.TestCase):
         d = f'tcp_data/tcp_data_{i}.dat'
 
         with open(a, 'r') as address, open(d, 'rb') as data:
-
             self.assertEqual(
                 checksum.checksum(address=address, data=data),
                 self.EXPECTED_OUTCOMES[i],
@@ -114,7 +111,6 @@ class TestAddrByteConversion(unittest.TestCase):
             expected_return)
 
     def test_get_tcp_data_length(self):
-
         with open('tcp_data/tcp_data_0.dat', 'rb') as f:
             content = f.read()
             expected_return = 48
@@ -122,7 +118,6 @@ class TestAddrByteConversion(unittest.TestCase):
             self.assertEqual(
                 checksum._get_tcp_data_length(content),
                 expected_return)
-
 
     # Test TCP header checksum -> 0
 
