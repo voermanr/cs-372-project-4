@@ -33,23 +33,23 @@ class TestChecksum(unittest.TestCase):
             )
 
     def test_file_pair_0(self):
-        # self._test_file_pair(0)
+        self._test_file_pair(0)
         pass
 
     def test_file_pair_1(self):
-        # self._test_file_pair(1)
+        self._test_file_pair(1)
         pass
 
     def test_file_pair_2(self):
-        # self._test_file_pair(2)
+        self._test_file_pair(2)
         pass
 
     def test_file_pair_3(self):
-        # self._test_file_pair(3)
+        self._test_file_pair(3)
         pass
 
     def test_file_pair_4(self):
-        # self._test_file_pair(4)
+        self._test_file_pair(4)
         pass
 
     def test_file_pair_5(self):
@@ -104,11 +104,13 @@ class TestAddrByteConversion(unittest.TestCase):
     def test_build_ip_pseudo_header(self):
         source_addr = '1.2.3.4'
         dest_addr = '10.2.255.0'
-        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00\x00\x06\x30'
+        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00\x00\x06\x00\x30'
 
-        self.assertEqual(checksum._build_ip_pseudo_header(
-            source_ip_address=source_addr, dest_ip_address=dest_addr, tcp_data_length=48),
+        ip_header = checksum._build_ip_pseudo_header(
+            source_ip_address=source_addr, dest_ip_address=dest_addr, tcp_data_length=48)
+        self.assertEqual(ip_header,
             expected_return)
+        self.assertEqual(len(ip_header), 12)
 
     def test_get_tcp_data_length(self):
         with open('tcp_data/tcp_data_0.dat', 'rb') as f:
@@ -132,6 +134,13 @@ class TestAddrByteConversion(unittest.TestCase):
             int.from_bytes(b'\x0D\x1C', byteorder='big')
         )
 
+    def test_calculate_checksum(self):
+        with open('tcp_data/tcp_data_0.dat','rb') as f:
+            data = f.read()
+            self.assertEqual(
+                checksum._calculate_checksum(b'\xc6\x33\x64\x4d\xc0\x00\x02\xaa\x00\x06\x00\x30', data),
+                int.from_bytes(data[16:18],'big')
+            )
 
 if __name__ == '__main__':
     unittest.main()
