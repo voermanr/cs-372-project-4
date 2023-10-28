@@ -2,7 +2,7 @@ import unittest
 
 import checksum
 
-
+# If I was gonna use this test suite, I would heavily restructure this code
 class TestChecksum(unittest.TestCase):
     # All this to avoid a magic number.
     EXPECTED_OUTCOMES = {
@@ -95,12 +95,6 @@ class TestAddrByteConversion(unittest.TestCase):
             b'\x01\x02\x03\x04',
         )
 
-    # def test_ip_addr_split(self):
-    #     address = '1.2.3.4'
-    #     expected_return = [1, 2, 3, 4]
-    #
-    #     self.assertEqual(checksum._ip_split(address), expected_return)
-
     def test_build_ip_pseudo_header(self):
         source_addr = '1.2.3.4'
         dest_addr = '10.2.255.0'
@@ -109,7 +103,7 @@ class TestAddrByteConversion(unittest.TestCase):
         ip_header = checksum._build_ip_pseudo_header(
             source_ip_address=source_addr, dest_ip_address=dest_addr, tcp_data_length=48)
         self.assertEqual(ip_header,
-            expected_return)
+                         expected_return)
         self.assertEqual(len(ip_header), 12)
 
     def test_get_tcp_data_length(self):
@@ -135,12 +129,13 @@ class TestAddrByteConversion(unittest.TestCase):
         )
 
     def test_calculate_checksum(self):
-        with open('tcp_data/tcp_data_0.dat','rb') as f:
+        with open('tcp_data/tcp_data_0.dat', 'rb') as f:
             data = f.read()
             self.assertEqual(
                 checksum._calculate_checksum(b'\xc6\x33\x64\x4d\xc0\x00\x02\xaa\x00\x06\x00\x30', data),
-                int.from_bytes(data[16:18],'big')
+                int.from_bytes(data[16:18], 'big')
             )
+
 
 if __name__ == '__main__':
     unittest.main()
