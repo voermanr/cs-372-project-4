@@ -26,21 +26,23 @@ def checksum(address, data):
     return match
 
 
-def _addr_split(address_pair: str):
+def _addr_split(address_pair: str) -> [str]:
+    """splits a pair of addresses into two addresses"""
     return address_pair.strip().split(sep=' ', maxsplit=1)
 
 
 def _addr_to_bytestring(address: str) -> bytes:
+    """Splits an IP address on the \'.\' character.
+    Then assembles and returns a bytestring from the IP address
+    in big-endian order"""
     byte_parts = [int.to_bytes(int(part), 1, 'big') for part in address.split('.')]
 
     return b''.join(byte_parts)
 
 
-# def _ip_split(ip_address: str) -> [int]:
-#     return [int(part) for part in ip_address.split('.')]
-
-
 def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str, tcp_data_length: int) -> bytes:
+    """Assembles an \"IP Header\" out of 2 addresses and the length of the packet associated with the IP header."""
+
     ip_pseudo_header = b''.join(
         [
             _addr_to_bytestring(source_ip_address),
@@ -57,18 +59,24 @@ def _get_tcp_data_length(content: bytes):
     return len(content)
 
 
-def _extract_checksum(tcp_header: bytes) -> int:
-    return int.from_bytes(tcp_header[16:18], byteorder='big')
+def _extract_checksum(tcp_data: bytes) -> int:
+    """Slices the checksum vale from a tcp header.
+    :returns: the checksum as an integer"""
+    return int.from_bytes(tcp_data[16:18], byteorder='big')
 
 
 def _reset_checksum(tcp_data: bytes) -> bytes:
-    zeroed_header = tcp_data[:16] + b'\x00\x00' + tcp_data[18:]
+    """Resets a TCP packets checksum header to b'\x00\x00' in preparation for
+    calculating a checksum.
+    :returns: a copy of tcp_data with the checksum bytes set to 0"""
+    tcp_data_checksum_zero = tcp_data[:16] + b'\x00\x00' + tcp_data[18:]
 
-    return zeroed_header
+    return tcp_data_checksum_zero
 
 
 def _equalize_length(tcp_data: bytes) -> bytes:
-    """Makes a tcp packet a length evenly divisible by the WORD_LENGTH (2)"""
+    """Makes a tcp packet a length evenly divisible by the WORD_LENGTH (2)
+    :returns: the tcp packet but padded with 0 bytes as necessary"""
     if len(tcp_data) % WORD_LENGTH != 0:
         tcp_data += b'\x00'
 
@@ -76,6 +84,8 @@ def _equalize_length(tcp_data: bytes) -> bytes:
 
 
 def _calculate_checksum(header, tcp_data):
+    """Does the 1's complement 1's complement thing.
+    :returns: a checksum in integer form"""
     tcp_data = _reset_checksum(tcp_data)
     tcp_data = _equalize_length(tcp_data)
 
@@ -99,5 +109,5 @@ if __name__ == '__main__':
         addr_path = f'tcp_data/tcp_addrs_{i}.txt'
         data_path = f'tcp_data/tcp_data_{i}.dat'
 
-        with open(addr_path, 'r') as address, open(data_path, 'rb') as data:
-            checksum(address=address, data=data)
+        with open(addr_path, 'r') as a, open(data_path, 'rb') as d:
+            checksum(address=a, data=d)
