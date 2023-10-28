@@ -95,11 +95,11 @@ class TestAddrByteConversion(unittest.TestCase):
             b'\x01\x02\x03\x04',
         )
 
-    def test_ip_addr_split(self):
-        address = '1.2.3.4'
-        expected_return = [1, 2, 3, 4]
-
-        self.assertEqual(checksum._ip_split(address), expected_return)
+    # def test_ip_addr_split(self):
+    #     address = '1.2.3.4'
+    #     expected_return = [1, 2, 3, 4]
+    #
+    #     self.assertEqual(checksum._ip_split(address), expected_return)
 
     def test_build_ip_pseudo_header(self):
         source_addr = '1.2.3.4'

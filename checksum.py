@@ -34,8 +34,8 @@ def _addr_to_bytestring(address: str) -> bytes:
     return b''.join(byte_parts)
 
 
-def _ip_split(ip_address: str) -> [int]:
-    return [int(part) for part in ip_address.split('.')]
+# def _ip_split(ip_address: str) -> [int]:
+#     return [int(part) for part in ip_address.split('.')]
 
 
 def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str, tcp_data_length: int) -> bytes:
