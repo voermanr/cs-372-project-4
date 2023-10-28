@@ -1,3 +1,5 @@
+WORD_LENGTH = 2
+
 def checksum(address, data):
     # Load in content from the address file
     address = address.readline().strip()
@@ -66,7 +68,8 @@ def _reset_checksum(tcp_data: bytes) -> bytes:
 
 
 def _equalize_length(tcp_data: bytes) -> bytes:
-    if len(tcp_data) % 2 == 1:
+    """Makes a tcp packet a length evenly divisible by the WORD_LENGTH (2)"""
+    if len(tcp_data) % WORD_LENGTH != 0:
         tcp_data += b'\x00'
 
     return tcp_data
