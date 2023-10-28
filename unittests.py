@@ -104,10 +104,10 @@ class TestAddrByteConversion(unittest.TestCase):
     def test_build_ip_pseudo_header(self):
         source_addr = '1.2.3.4'
         dest_addr = '10.2.255.0'
-        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00\x00\x06'
+        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00\x00\x06\x30'
 
         self.assertEqual(checksum._build_ip_pseudo_header(
-            source_ip_address=source_addr, dest_ip_address=dest_addr),
+            source_ip_address=source_addr, dest_ip_address=dest_addr, tcp_data_length=48),
             expected_return)
 
     def test_get_tcp_data_length(self):

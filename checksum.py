@@ -11,10 +11,15 @@ def checksum(address, data):
     # Build IP pseudo header
     ip_pseudo_header = _build_ip_pseudo_header(
         source_ip_address=source_ip_addr,
-        dest_ip_address=dest_ip_addr
+        dest_ip_address=dest_ip_addr,
+        tcp_data_length=_get_tcp_data_length(data)
     )
 
-    return False
+    provided_checksum = _extract_checksum(data)
+
+    calculated_checksum = 0
+
+    return provided_checksum == calculated_checksum
 
 
 def _addr_split(address_pair: str):
@@ -31,12 +36,15 @@ def _ip_split(ip_address: str) -> [int]:
     return [int(part) for part in ip_address.split('.')]
 
 
-def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str) -> bytes:
+def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str, tcp_data_length: int) -> bytes:
 
-    ip_pseudo_header = b''.join([
+    ip_pseudo_header = b''.join(
+        [
         _addr_to_bytestring(source_ip_address),
         _addr_to_bytestring(dest_ip_address),
-        b'\x00\x06']
+        b'\x00\x06',
+        tcp_data_length.to_bytes(1,'big')
+        ]
     )
 
     return ip_pseudo_header
