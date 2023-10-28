@@ -22,18 +22,9 @@ def _addr_split(address_pair: str):
 
 
 def _addr_to_bytestring(address: str) -> bytes:
-    bytestring = b''
+    byte_parts = [int.to_bytes(int(part), 1, 'big') for part in address.split('.')]
 
-    # split address into array
-    arr = _ip_split(address)
-
-    for i in range(len(arr)):
-        bytestring += int.to_bytes(arr[i],1, 'big')
-
-    # This should always hold true based on how ip addresses are constructed
-    assert len(bytestring) == 4
-
-    return bytestring
+    return b''.join(byte_parts)
 
 
 def _ip_split(ip_address: str) -> [int]:
@@ -42,8 +33,11 @@ def _ip_split(ip_address: str) -> [int]:
 
 def _build_ip_pseudo_header(source_ip_address: str, dest_ip_address: str) -> bytes:
 
-    ip_pseudo_header = _addr_to_bytestring(source_ip_address)
-    ip_pseudo_header += _addr_to_bytestring(dest_ip_address)
+    ip_pseudo_header = b''.join([
+        _addr_to_bytestring(source_ip_address),
+        _addr_to_bytestring(dest_ip_address),
+        b'\x00\x06']
+    )
 
     return ip_pseudo_header
 
@@ -54,3 +48,9 @@ def _get_tcp_data_length(content: bytes):
 
 def _extract_checksum(tcp_header: bytes) -> int:
     return int.from_bytes(tcp_header[16:18], byteorder='big')
+
+
+def _reset_checksum(tcp_header: bytes) -> bytes:
+    zeroed_header = tcp_header[:16] + b'\x00\x00' + tcp_header[18:]
+
+    return zeroed_header

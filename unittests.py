@@ -81,11 +81,11 @@ class TestAddressSplit(unittest.TestCase):
 
 
 class TestAddrByteConversion(unittest.TestCase):
-    test_tcp_header = b''
+    TEST_TCP_HEADER = b''
 
     def setUp(self):
         with open('tcp_data/tcp_data_0.dat', 'rb') as f:
-            self.test_tcp_header = f.read()[:32]
+            self.TEST_TCP_HEADER = f.read()[:32]
 
     def test_addr_to_bytestring(self):
         address = '1.2.3.4'
@@ -104,7 +104,7 @@ class TestAddrByteConversion(unittest.TestCase):
     def test_build_ip_pseudo_header(self):
         source_addr = '1.2.3.4'
         dest_addr = '10.2.255.0'
-        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00'
+        expected_return = b'\x01\x02\x03\x04\x0A\x02\xFF\x00\x00\x06'
 
         self.assertEqual(checksum._build_ip_pseudo_header(
             source_ip_address=source_addr, dest_ip_address=dest_addr),
@@ -119,12 +119,16 @@ class TestAddrByteConversion(unittest.TestCase):
                 checksum._get_tcp_data_length(content),
                 expected_return)
 
-    # Test TCP header checksum -> 0
+    def test_reset_checksum(self):
+        expected_result = self.TEST_TCP_HEADER[:16] + b'\x00\x00' + self.TEST_TCP_HEADER[18:]
+        self.assertEqual(
+            checksum._reset_checksum(self.TEST_TCP_HEADER),
+            expected_result
+        )
 
-    # test existing checksum extract
     def test_extract_checksum(self):
         self.assertEqual(
-            checksum._extract_checksum(self.test_tcp_header),
+            checksum._extract_checksum(self.TEST_TCP_HEADER),
             int.from_bytes(b'\x0D\x1C', byteorder='big')
         )
 
